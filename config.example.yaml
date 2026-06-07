@@ -1,0 +1,69 @@
+# ================================================================
+# Agentic-OS Trading Bot — Trading Configuration
+# Copy to config.yaml and adjust to your preferences
+# ================================================================
+
+exchange:
+  name: binance
+  # testnet: true keeps real money safe while you test
+  testnet: true
+  recv_window: 6000
+
+llm:
+  provider: kimi
+  model: kimi-k2.6
+  temperature: 0.3
+  max_tokens: 2048
+  # Number of candles of market context sent to Kimi per call
+  context_candles: 100
+
+trading:
+  symbol: BTCUSDT
+  # Timeframes used for multi-period analysis
+  timeframes: [1m, 5m, 15m, 1h]
+  leverage: 5
+  # Minimum 24h volume (USDT) — filters illiquid markets
+  min_volume_usdt: 100_000_000
+  # Polling interval in seconds when using CLI mode
+  poll_interval: 60
+
+risk:
+  # Max loss per trade as fraction of balance
+  max_loss_per_trade: 0.015
+  # Max total open exposure
+  max_total_exposure: 0.333
+  # Stop-loss % from entry
+  stop_loss_pct: 0.02
+  # Take-profit % from entry
+  take_profit_pct: 0.04
+  # Halt trading after this many consecutive losses
+  max_consecutive_losses: 5
+  # Halt if drawdown from peak exceeds this fraction
+  max_drawdown: 0.15
+
+agents:
+  data_sync: true
+  quant_analyst: true
+  risk_audit: true
+  multi_period_parser: true
+  # LLM-powered agents (use Kimi K2.6 API credits)
+  llm_trend: true
+  llm_setup: true
+  llm_trigger: true
+  # Self-reflection after every N trades
+  reflection_agent: true
+  reflection_interval: 10
+  # ML prediction model (auto-retrains on new data)
+  predict_agent: false
+  regime_detector: true
+
+dashboard:
+  host: 0.0.0.0
+  port: 8000
+  # Set in .env — not here
+  # password: see DASHBOARD_PASSWORD
+
+logging:
+  level: INFO
+  # Logs older than this many days are auto-deleted
+  retain_days: 30

@@ -1,0 +1,47 @@
+# Exchange
+python-binance==1.0.19
+ccxt==4.2.25
+
+# Data processing
+pandas>=2.1.4
+numpy>=1.26.2
+ta==0.11.0
+
+# Async
+aiohttp==3.9.1
+websockets==12.0
+
+# LLM (OpenAI-compatible SDK — works with Kimi's API)
+openai>=1.6.1
+
+# Storage
+redis==5.0.1
+sqlalchemy==2.0.46
+
+# Config & utilities
+pyyaml==6.0.1
+python-dotenv==1.0.0
+rich>=13.0.0
+loguru==0.7.2
+requests==2.31.0
+jsonschema==4.20.0
+
+# Web dashboard
+fastapi==0.104.1
+uvicorn==0.24.0
+python-multipart==0.0.6
+
+# ML (optional predict agent)
+lightgbm>=4.0.0
+scikit-learn>=1.3.0
+
+# Data serialisation
+pyarrow==23.0.1
+
+# Backtesting & visualisation
+backtrader==1.9.78.123
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# Telegram notifications (optional)
+python-telegram-bot>=20.0
