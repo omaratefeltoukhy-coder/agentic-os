@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+:root {
+  --color-petrol: #0e1b24;
+  --color-petrol-light: #142a37;
+  --color-petrol-lighter: #1c3a4a;
+  --color-gold: #e8a94b;
+  --color-gold-light: #f1c47f;
+  --color-sand: #ede8df;
+  --color-sand-dim: #b9b3a6;
+  --color-danger: #e0665c;
+  --color-success: #6fbf8b;
+
+  --background: var(--color-petrol);
+  --foreground: var(--color-sand);
+}
+
+@theme inline {
+  --color-petrol: var(--color-petrol);
+  --color-petrol-light: var(--color-petrol-light);
+  --color-petrol-lighter: var(--color-petrol-lighter);
+  --color-gold: var(--color-gold);
+  --color-gold-light: var(--color-gold-light);
+  --color-sand: var(--color-sand);
+  --color-sand-dim: var(--color-sand-dim);
+  --color-danger: var(--color-danger);
+  --color-success: var(--color-success);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-display: var(--font-bricolage);
+  --font-sans: var(--font-instrument);
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+body {
+  font-family: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  border-color: var(--color-petrol-lighter);
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-petrol);
+}
