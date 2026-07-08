@@ -210,10 +210,46 @@ export default async function CaregiverDashboard() {
           </LinkButton>
         </Card>
         <Card>
+          <h2 className="font-display text-sm font-semibold text-sand">
+            ID verification{" "}
+            {profile.verificationStatus === "APPROVED" && <span className="text-success">✓</span>}
+          </h2>
+          <p className="mt-1 text-sm text-sand-dim">
+            {profile.verificationStatus === "APPROVED"
+              ? "Verified badge is live on your profile."
+              : "Get the Verified badge — owners trust verified caregivers 3× more."}
+          </p>
+          <LinkButton href="/dashboard/caregiver/verification" variant="secondary" size="sm" className="mt-3">
+            {profile.verificationStatus === "APPROVED" ? "View status" : "Get verified"}
+          </LinkButton>
+        </Card>
+        <Card>
           <h2 className="font-display text-sm font-semibold text-sand">All bookings</h2>
           <p className="mt-1 text-sm text-sand-dim">See your full booking history.</p>
           <LinkButton href="/dashboard/caregiver/bookings" variant="secondary" size="sm" className="mt-3">
             View bookings
+          </LinkButton>
+        </Card>
+        <Card>
+          <h2 className="font-display text-sm font-semibold text-sand">
+            Caregiver Pro {profile.isProBadge && <span className="text-gold">· Active</span>}
+          </h2>
+          <p className="mt-1 text-sm text-sand-dim">
+            Featured placement, 10% commission, instant payouts.
+          </p>
+          <LinkButton href="/dashboard/caregiver/subscription" variant="secondary" size="sm" className="mt-3">
+            View plan
+          </LinkButton>
+        </Card>
+        <Card>
+          <h2 className="font-display text-sm font-semibold text-sand">Featured listing</h2>
+          <p className="mt-1 text-sm text-sand-dim">
+            {profile.isFeaturedUntil && profile.isFeaturedUntil > new Date()
+              ? `Featured until ${profile.isFeaturedUntil.toISOString().slice(0, 10)}`
+              : "Boost your profile to the top of search for 7 days."}
+          </p>
+          <LinkButton href="/dashboard/caregiver/featured" variant="secondary" size="sm" className="mt-3">
+            Boost profile
           </LinkButton>
         </Card>
       </div>

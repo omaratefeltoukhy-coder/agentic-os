@@ -212,3 +212,41 @@ export const WEEKEND_DAYS: Record<GulfCityCode, number[]> = {
   MANAMA: [5, 6],
   MUSCAT: [5, 6],
 };
+
+// Referral credit awarded to both sides when a referred friend completes
+// their first booking.
+export const REFERRAL_CREDIT: Record<CurrencyCode, number> = {
+  AED: 20,
+  SAR: 20,
+  QAR: 20,
+  KWD: 2,
+  BHD: 2,
+  OMR: 2,
+};
+
+export const PLUS_MONTHLY_PRICE: Record<CurrencyCode, number> = {
+  AED: 29,
+  SAR: 29,
+  QAR: 29,
+  KWD: 3,
+  BHD: 3,
+  OMR: 3,
+};
+
+export const PRO_MONTHLY_PRICE: Record<CurrencyCode, number> = {
+  AED: 49,
+  SAR: 49,
+  QAR: 49,
+  KWD: 5,
+  BHD: 5,
+  OMR: 5,
+};
+
+export const FEATURED_LISTING_PRICE: Record<CurrencyCode, number> = {
+  AED: 49,
+  SAR: 49,
+  QAR: 49,
+  KWD: 5,
+  BHD: 5,
+  OMR: 5,
+};

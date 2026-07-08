@@ -19,6 +19,7 @@ export function computeBookingPrice({
   isProBadge,
   ownerHasPlus = false,
   discountAmount = 0,
+  commissionRateOverride,
 }: {
   hourlyRate: number;
   durationMinutes: number;
@@ -26,10 +27,13 @@ export function computeBookingPrice({
   isProBadge: boolean;
   ownerHasPlus?: boolean;
   discountAmount?: number;
+  /** Admin-configured rate (see PlatformSetting) — falls back to the static
+   * default/pro rate when omitted, which is what client-side previews use. */
+  commissionRateOverride?: number;
 }) {
   const subtotal = round(hourlyRate * (durationMinutes / 60), currency);
   const serviceFee = serviceFeeFor(currency, ownerHasPlus);
-  const commissionRate = commissionRateFor(isProBadge);
+  const commissionRate = commissionRateOverride ?? commissionRateFor(isProBadge);
   const commissionAmount = round(subtotal * commissionRate, currency);
   const caregiverPayout = round(subtotal - commissionAmount, currency);
   const total = Math.max(0, round(subtotal + serviceFee - discountAmount, currency));

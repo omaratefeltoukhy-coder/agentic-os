@@ -20,6 +20,7 @@ export const registerSchema = z.object({
     .or(z.literal("")),
   whatsappOptIn: z.boolean().default(false),
   role: z.enum(["OWNER", "CAREGIVER"]),
+  referralCode: z.string().trim().max(40).optional().or(z.literal("")),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;

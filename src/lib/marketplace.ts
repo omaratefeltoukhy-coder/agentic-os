@@ -50,7 +50,14 @@ export async function searchCaregivers(filters: CaregiverSearchFilters): Promise
   const profiles = await prisma.caregiverProfile.findMany({
     where,
     include: { user: { select: { name: true, image: true } } },
-    orderBy: [{ isFeaturedUntil: "desc" }, { ratingAverage: "desc" }, { createdAt: "desc" }],
+    orderBy: [
+      // Postgres puts NULLs first under plain DESC — force featured (and
+      // rated) caregivers to actually sort to the top.
+      { isFeaturedUntil: { sort: "desc", nulls: "last" } },
+      { isProBadge: "desc" },
+      { ratingAverage: { sort: "desc", nulls: "last" } },
+      { createdAt: "desc" },
+    ],
     take: 60,
   });
 

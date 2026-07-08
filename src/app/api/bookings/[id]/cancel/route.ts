@@ -26,7 +26,12 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   }
 
   const start = bookingStartDateTime(booking.date, booking.startMinute);
-  const chargeRatio = isOwner ? cancellationChargeRatio(start) : 0;
+  const ownerHasPlus = isOwner
+    ? !!(await prisma.subscription.findFirst({
+        where: { userId: booking.ownerId, plan: "OWNER_PLUS", status: "ACTIVE" },
+      }))
+    : false;
+  const chargeRatio = isOwner && !ownerHasPlus ? cancellationChargeRatio(start) : 0;
 
   let paymentStatus = booking.paymentStatus;
   const stripe = getStripe();

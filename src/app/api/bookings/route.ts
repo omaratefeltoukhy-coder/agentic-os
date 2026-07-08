@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createBookingSchema } from "@/lib/validations/booking";
-import { createBooking, BookingConflictError } from "@/lib/bookings";
+import { createBooking, BookingConflictError, PromoError } from "@/lib/bookings";
 import { stripeConfigured } from "@/lib/payments/stripe";
 import { createCheckoutSessionForBooking } from "@/lib/payments/checkout";
 import { notify } from "@/lib/notifications/notify";
@@ -74,6 +74,7 @@ export async function POST(req: Request) {
       durationMinutes: data.durationMinutes,
       ownerNote: data.ownerNote,
       paymentMethod: data.paymentMethod,
+      promoCode: data.promoCode || undefined,
     });
 
     const caregiverProfile = await prisma.caregiverProfile.findUniqueOrThrow({
@@ -126,6 +127,9 @@ export async function POST(req: Request) {
   } catch (err) {
     if (err instanceof BookingConflictError) {
       return NextResponse.json({ error: err.message }, { status: 409 });
+    }
+    if (err instanceof PromoError) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
     }
     throw err;
   }

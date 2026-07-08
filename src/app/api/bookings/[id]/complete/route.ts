@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/payments/stripe";
 import { notify } from "@/lib/notifications/notify";
+import { maybeAwardReferralCredit } from "@/lib/referrals";
 
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
@@ -32,6 +33,8 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     where: { id },
     data: { status: "COMPLETED", completedAt: new Date(), paymentStatus },
   });
+
+  await maybeAwardReferralCredit(booking.ownerId).catch(() => null);
 
   await notify({
     userId: booking.ownerId,

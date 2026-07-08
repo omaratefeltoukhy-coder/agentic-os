@@ -4,14 +4,15 @@ import { prisma } from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
 import { LinkButton } from "@/components/ui/button";
 import { BookingListItem } from "@/components/booking/booking-list-item";
-import type { CurrencyCode } from "@/lib/constants/gulf";
+import { getReferralBalance } from "@/lib/referral-balance";
+import { formatMoney, type CurrencyCode } from "@/lib/constants/gulf";
 
 export default async function OwnerDashboard() {
   const session = await auth();
   if (!session?.user) redirect("/login");
   if (!session.user.roles.includes("OWNER")) redirect("/dashboard");
 
-  const [upcomingCount, petsCount, recentBookings] = await Promise.all([
+  const [upcomingCount, petsCount, recentBookings, referralBalance] = await Promise.all([
     prisma.booking.count({
       where: { ownerId: session.user.id, status: { in: ["REQUESTED", "ACCEPTED", "IN_PROGRESS"] } },
     }),
@@ -22,7 +23,15 @@ export default async function OwnerDashboard() {
       orderBy: { date: "desc" },
       take: 5,
     }),
+    getReferralBalance(session.user.id),
   ]);
+
+  const referralLabel =
+    referralBalance.size === 0
+      ? "0 AED"
+      : Array.from(referralBalance.entries())
+          .map(([currency, amount]) => formatMoney(amount, currency as CurrencyCode))
+          .join(" + ");
 
   return (
     <div className="mx-auto w-full max-w-4xl">
@@ -42,7 +51,7 @@ export default async function OwnerDashboard() {
         </Card>
         <Card>
           <div className="text-sm text-sand-dim">Referral credit</div>
-          <div className="mt-2 font-display text-3xl font-bold text-sand">0 AED</div>
+          <div className="mt-2 font-display text-3xl font-bold text-sand">{referralLabel}</div>
         </Card>
       </div>
 
@@ -89,6 +98,24 @@ export default async function OwnerDashboard() {
           <p className="mt-1 text-sm text-sand-dim">Manage pet profiles for booking.</p>
           <LinkButton href="/dashboard/owner/pets" variant="secondary" size="sm" className="mt-3">
             Manage pets
+          </LinkButton>
+        </Card>
+        <Card>
+          <h2 className="font-display text-sm font-semibold text-sand">GulfPaws Plus</h2>
+          <p className="mt-1 text-sm text-sand-dim">
+            Zero service fees, 5% off every booking, free cancellation.
+          </p>
+          <LinkButton href="/dashboard/owner/subscription" variant="secondary" size="sm" className="mt-3">
+            View plan
+          </LinkButton>
+        </Card>
+        <Card>
+          <h2 className="font-display text-sm font-semibold text-sand">Refer &amp; earn</h2>
+          <p className="mt-1 text-sm text-sand-dim">
+            Invite friends — you both get booking credit.
+          </p>
+          <LinkButton href="/dashboard/owner/referrals" variant="secondary" size="sm" className="mt-3">
+            Share your link
           </LinkButton>
         </Card>
         <Card>

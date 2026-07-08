@@ -43,6 +43,7 @@ export function BookingWizard({
   const [selectedStartMinute, setSelectedStartMinute] = useState<number | null>(null);
   const [petId, setPetId] = useState(pets[0]?.id ?? "");
   const [note, setNote] = useState("");
+  const [promoCode, setPromoCode] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"CASH" | "CARD">("CASH");
   const [repeat, setRepeat] = useState(false);
   const [repeatWeeks, setRepeatWeeks] = useState(4);
@@ -115,6 +116,7 @@ export function BookingWizard({
             durationMinutes: duration,
             ownerNote: note,
             paymentMethod,
+            promoCode,
           }),
         });
         const data = await res.json();
@@ -366,6 +368,17 @@ export function BookingWizard({
         )}
       </div>
 
+      <div className="mt-4">
+        <Label htmlFor="promo">Promo code (optional)</Label>
+        <input
+          id="promo"
+          value={promoCode}
+          onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+          placeholder="FIRST20"
+          className="w-full rounded-lg bg-petrol-light border border-petrol-lighter px-4 py-3 text-sand placeholder:text-sand-dim/60 outline-none transition-colors focus:border-gold"
+        />
+      </div>
+
       <div className="mt-5 rounded-lg border border-petrol-lighter bg-petrol-light px-4 py-3 text-sm">
         <div className="flex justify-between text-sand-dim">
           <span>{durationLabel(duration)} at {formatMoney(hourlyRate, currency)}/hr</span>
@@ -379,6 +392,9 @@ export function BookingWizard({
           <span>Total{repeat ? ` × ${repeatWeeks}` : ""}</span>
           <span>{formatMoney(price.total, currency)}</span>
         </div>
+        <p className="mt-2 text-xs text-sand-dim">
+          Referral credit and GulfPaws Plus discounts apply automatically at checkout.
+        </p>
       </div>
 
       {error && <p className="mt-3 text-sm text-danger">{error}</p>}

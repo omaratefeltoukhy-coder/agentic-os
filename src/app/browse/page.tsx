@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { Header } from "@/components/layout/header";
 import { Card } from "@/components/ui/card";
@@ -7,6 +8,8 @@ import { FilterBar } from "@/components/marketplace/filter-bar";
 import { CaregiverCard } from "@/components/marketplace/caregiver-card";
 import { HeatBanner } from "@/components/marketplace/heat-banner";
 import { searchCaregivers } from "@/lib/marketplace";
+import { SEO_SERVICES, citySlug } from "@/lib/seo";
+import { CITY_INFO, GULF_CITIES } from "@/lib/constants/gulf";
 
 export default async function BrowsePage({
   searchParams,
@@ -65,6 +68,23 @@ export default async function BrowsePage({
             <LinkButton href="/signup?role=owner">Sign up</LinkButton>
           </Card>
         )}
+
+        <div className="mt-10">
+          <h2 className="text-sm font-medium text-sand-dim">Popular searches</h2>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {SEO_SERVICES.flatMap((service) =>
+              GULF_CITIES.map((city) => (
+                <Link
+                  key={`${service.slug}-${city}`}
+                  href={`/find/${service.slug}/${citySlug(city)}`}
+                  className="rounded-full border border-petrol-lighter px-3 py-1 text-xs text-sand-dim hover:border-gold hover:text-gold"
+                >
+                  {service.label} in {CITY_INFO[city].label}
+                </Link>
+              ))
+            )}
+          </div>
+        </div>
       </main>
     </div>
   );

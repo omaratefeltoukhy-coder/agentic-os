@@ -12,7 +12,13 @@ import { GULF_PHONE_CODES } from "@/lib/constants/gulf";
 
 type Role = "OWNER" | "CAREGIVER";
 
-export function SignupForm({ initialRole }: { initialRole: Role }) {
+export function SignupForm({
+  initialRole,
+  referralCode,
+}: {
+  initialRole: Role;
+  referralCode?: string;
+}) {
   const router = useRouter();
   const [role, setRole] = useState<Role>(initialRole);
   const [step, setStep] = useState<"form" | "verify">("form");
@@ -42,6 +48,7 @@ export function SignupForm({ initialRole }: { initialRole: Role }) {
           phoneNumber,
           whatsappOptIn,
           role,
+          referralCode,
         }),
       });
       const data = await res.json();
@@ -164,6 +171,13 @@ export function SignupForm({ initialRole }: { initialRole: Role }) {
           Caregiver
         </button>
       </div>
+
+      {referralCode && (
+        <p className="mt-3 rounded-lg bg-gold/10 px-3 py-2 text-xs text-gold">
+          You were invited to GulfPaws — you&apos;ll both get booking credit after your first
+          booking.
+        </p>
+      )}
 
       <div className="mt-5">
         <GoogleButton

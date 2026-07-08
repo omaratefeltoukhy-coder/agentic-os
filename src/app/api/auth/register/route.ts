@@ -19,8 +19,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
   }
 
-  const { name, email, password, phoneCountryCode, phoneNumber, whatsappOptIn, role } = parsed.data;
+  const { name, email, password, phoneCountryCode, phoneNumber, whatsappOptIn, role, referralCode } =
+    parsed.data;
   const normalizedEmail = email.toLowerCase();
+
+  const referrer = referralCode
+    ? await prisma.user.findUnique({ where: { referralCode }, select: { id: true } })
+    : null;
 
   const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
   if (existing) {
@@ -53,6 +58,7 @@ export async function POST(req: Request) {
       roles: [role],
       activeRole: role,
       hasSelectedRole: true,
+      referredById: referrer?.id ?? null,
     },
     update: {
       name,

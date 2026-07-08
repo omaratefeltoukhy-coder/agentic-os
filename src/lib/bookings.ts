@@ -2,6 +2,8 @@ import { Prisma, type BookingStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { coveredSlots } from "@/lib/time";
 import { computeBookingPrice } from "@/lib/pricing";
+import { resolvePromoDiscount, recordPromoRedemption, PromoError } from "@/lib/promo";
+import { getCommissionRates } from "@/lib/platform-settings";
 import type { CurrencyCode } from "@/lib/constants/gulf";
 
 const ACTIVE_STATUSES: BookingStatus[] = [
@@ -20,6 +22,8 @@ export class BookingConflictError extends Error {
   }
 }
 
+export { PromoError };
+
 type CreateBookingInput = {
   ownerId: string;
   caregiverProfileId: string;
@@ -31,6 +35,7 @@ type CreateBookingInput = {
   ownerNote?: string;
   paymentMethod: "CASH" | "CARD";
   recurrenceGroupId?: string;
+  promoCode?: string;
 };
 
 export async function createBooking(input: CreateBookingInput) {
@@ -65,11 +70,48 @@ export async function createBooking(input: CreateBookingInput) {
       const freeSet = new Set(weeklySlots.map((s) => s.startMinute));
       if (!wanted.every((m) => freeSet.has(m))) throw new BookingConflictError();
 
+      const currency = profile.currency as CurrencyCode;
+      const baseSubtotal = Number(profile.hourlyRate) * (input.durationMinutes / 60);
+
+      const [ownerPlusSub, referralCredits] = await Promise.all([
+        tx.subscription.findFirst({
+          where: { userId: input.ownerId, plan: "OWNER_PLUS", status: "ACTIVE" },
+        }),
+        tx.referralCredit.findMany({
+          where: { ownerId: input.ownerId, isRedeemed: false, currency },
+        }),
+      ]);
+      const ownerHasPlus = !!ownerPlusSub;
+
+      let discount = ownerHasPlus ? baseSubtotal * 0.05 : 0;
+
+      let promoId: string | null = null;
+      if (input.promoCode) {
+        const resolved = await resolvePromoDiscount(
+          input.promoCode,
+          input.ownerId,
+          baseSubtotal,
+          currency,
+          tx
+        );
+        promoId = resolved.promoId;
+        discount += resolved.discount;
+      }
+
+      const referralBalance = referralCredits.reduce((sum, c) => sum + Number(c.amount), 0);
+      const referralApplied = Math.min(referralBalance, Math.max(0, baseSubtotal - discount));
+      discount += referralApplied;
+
+      const { defaultRate, proRate } = await getCommissionRates();
+
       const price = computeBookingPrice({
         hourlyRate: Number(profile.hourlyRate),
         durationMinutes: input.durationMinutes,
-        currency: profile.currency as CurrencyCode,
+        currency,
         isProBadge: profile.isProBadge,
+        ownerHasPlus,
+        discountAmount: discount,
+        commissionRateOverride: profile.isProBadge ? proRate : defaultRate,
       });
 
       try {
@@ -98,6 +140,29 @@ export async function createBooking(input: CreateBookingInput) {
             recurrenceGroupId: input.recurrenceGroupId ?? null,
           },
         });
+
+        if (promoId) {
+          const promoDiscountOnly = discount - referralApplied - (ownerHasPlus ? baseSubtotal * 0.05 : 0);
+          const redemption = await recordPromoRedemption(
+            promoId,
+            input.ownerId,
+            Math.max(0, promoDiscountOnly),
+            currency,
+            tx
+          );
+          await tx.booking.update({ where: { id: booking.id }, data: { promoRedemptionId: redemption.id } });
+        }
+
+        if (referralApplied > 0) {
+          let remaining = referralApplied;
+          for (const credit of referralCredits) {
+            if (remaining <= 0) break;
+            const amount = Number(credit.amount);
+            await tx.referralCredit.update({ where: { id: credit.id }, data: { isRedeemed: true } });
+            remaining -= amount;
+          }
+        }
+
         return booking;
       } catch (err) {
         if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
