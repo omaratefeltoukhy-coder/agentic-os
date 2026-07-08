@@ -230,6 +230,43 @@ are not yet translated string-by-string — extending coverage is a matter of
 adding entries to that dictionary and swapping literals for `t.xxx` the same
 way `src/app/page.tsx` does, not new infrastructure.
 
+## Deploying on Vercel (recommended — free, gives you a real link)
+
+This is the easiest way to get GulfPaws onto a real `https://` address you
+can open on your own phone and install like an app. No command line needed
+— everything below is clicking buttons on two free websites.
+
+1. **Create a free database.** Go to [neon.tech](https://neon.tech), sign
+   up (using your GitHub account is fastest), and create a new project. On
+   the project dashboard, copy the **connection string** it shows you —
+   it's one long line starting with `postgresql://`.
+2. **Deploy the app.** Go to [vercel.com](https://vercel.com), sign up with
+   the same GitHub account, click **Add New → Project**, and import the
+   `agentic-os` repository (branch `claude/gulfpaws-marketplace-build-dbl241`).
+3. Before clicking Deploy, open **Environment Variables** and add:
+   - `DATABASE_URL` → paste the connection string from Neon
+   - `AUTH_SECRET` → a random secret string. Vercel has a "Generate" button
+     next to this field on the setup screen — use that, or generate one
+     yourself with `openssl rand -base64 32`. Never reuse a secret that's
+     been shared anywhere public (like a chat log or this file).
+   - `AUTH_TRUST_HOST` → `true`
+4. Still on that setup screen, open **Build & Development Settings** and
+   set **Build Command** to:
+   ```
+   npx prisma migrate deploy && npx prisma db seed && npm run build
+   ```
+   (this sets up the database tables and demo data automatically —
+   nothing else to run by hand)
+5. Click **Deploy** and wait a couple of minutes. Vercel gives you a link
+   like `https://agentic-os-yourname.vercel.app` — that's your real,
+   permanent app link.
+6. On your Android phone, open that link in **Chrome**, tap the ⋮ menu,
+   and tap **"Install app"** (or **"Add to Home Screen"**). It'll appear
+   as its own icon and open full-screen, like any other app.
+
+Demo login accounts (see "Quick start" near the top of this file) work
+immediately — password `Demo1234` for all of them.
+
 ## Deploying on Replit
 
 1. Create a new Replit from this repo (or import via Git).
