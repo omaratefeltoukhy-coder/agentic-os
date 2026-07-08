@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { Header } from "@/components/layout/header";
 import { Card } from "@/components/ui/card";
-import { LinkButton } from "@/components/ui/button";
 import { BecomeCaregiverButton } from "@/components/auth/become-caregiver";
 
 export default async function CaregiverOnboardingPage() {
@@ -11,6 +11,16 @@ export default async function CaregiverOnboardingPage() {
 
   const isCaregiver = session.user.roles.includes("CAREGIVER");
 
+  if (isCaregiver) {
+    const profile = await prisma.caregiverProfile.findUnique({
+      where: { userId: session.user.id },
+      include: { availabilitySlots: { take: 1 } },
+    });
+    if (!profile) redirect("/onboarding/caregiver/profile");
+    if (profile.availabilitySlots.length === 0) redirect("/onboarding/caregiver/availability");
+    redirect("/dashboard/caregiver");
+  }
+
   return (
     <div className="flex flex-1 flex-col">
       <Header />
@@ -18,21 +28,13 @@ export default async function CaregiverOnboardingPage() {
         <Card>
           <div className="text-3xl">🐕</div>
           <h1 className="mt-2 font-display text-2xl font-bold text-sand">
-            {isCaregiver ? "You're set up as a caregiver" : "Become a GulfPaws caregiver"}
+            Become a GulfPaws caregiver
           </h1>
           <p className="mt-2 text-sm text-sand-dim">
-            {isCaregiver
-              ? "Your rate & availability wizard lands in the next build step. For now, head to your caregiver dashboard."
-              : "Set your own hourly rate, choose the areas you cover, and pick the times you're free. The full rate & availability wizard ships in the next build step — this just reserves your caregiver role."}
+            Set your own hourly rate, choose the areas you cover, and pick the times you&apos;re
+            free. Takes about two minutes.
           </p>
-
-          {isCaregiver ? (
-            <LinkButton href="/dashboard/caregiver" className="mt-5">
-              Go to caregiver dashboard
-            </LinkButton>
-          ) : (
-            <BecomeCaregiverButton />
-          )}
+          <BecomeCaregiverButton />
         </Card>
       </main>
     </div>

@@ -247,6 +247,9 @@ model CaregiverProfile {
   isFeaturedUntil DateTime?
   isVacationMode  Boolean   @default(false)
 
+  payoutIban      String?
+  payoutBankName  String?
+
   ratingAverage Decimal? @db.Decimal(3, 2)
   ratingCount   Int      @default(0)
 
@@ -373,7 +376,7 @@ model Booking {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  review       Review?
+  reviews      Review[]
   photoUpdates BookingPhotoUpdate[]
   conversation Conversation?
 
@@ -402,9 +405,11 @@ model BookingPhotoUpdate {
 // Reviews
 // ---------------------------------------------------------------------------
 
+// Two-way: a booking can have up to two reviews, one per direction
+// (owner -> caregiver and caregiver -> owner).
 model Review {
   id        String  @id @default(cuid())
-  bookingId String  @unique
+  bookingId String
   booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   authorId String
@@ -418,6 +423,7 @@ model Review {
 
   createdAt DateTime @default(now())
 
+  @@unique([bookingId, authorId])
   @@index([subjectId])
 }
 

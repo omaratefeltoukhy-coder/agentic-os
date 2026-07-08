@@ -125,3 +125,90 @@ export const LANGUAGE_LABELS: Record<(typeof LANGUAGES)[number], string> = {
   TAGALOG: "Tagalog",
   FRENCH: "French",
 };
+
+export const NEIGHBORHOODS: Record<GulfCityCode, string[]> = {
+  DUBAI: [
+    "Dubai Marina",
+    "JLT",
+    "Downtown Dubai",
+    "Business Bay",
+    "Al Barsha",
+    "Jumeirah",
+    "Deira",
+    "Arabian Ranches",
+    "Mirdif",
+    "Al Nahda",
+  ],
+  ABU_DHABI: [
+    "Al Reem Island",
+    "Yas Island",
+    "Corniche",
+    "Al Khalidiya",
+    "Al Raha Beach",
+    "Saadiyat Island",
+    "Al Mushrif",
+    "Khalifa City",
+  ],
+  RIYADH: [
+    "Al Olaya",
+    "Al Malaz",
+    "Al Nakheel",
+    "King Fahd District",
+    "Diplomatic Quarter",
+    "Al Yasmin",
+    "Al Sahafah",
+    "Hittin",
+  ],
+  JEDDAH: ["Al Hamra", "Al Salamah", "Al Rawdah", "Al Zahra", "Al Shatea", "Obhur", "Al Naeem"],
+  DOHA: ["West Bay", "The Pearl", "Al Sadd", "Al Waab", "Al Muntazah", "Al Dafna", "Msheireb"],
+  KUWAIT_CITY: ["Salmiya", "Hawally", "Jabriya", "Mishref", "Shaab", "Salwa", "Bayan"],
+  MANAMA: ["Juffair", "Seef", "Adliya", "Riffa", "Amwaj Islands", "Busaiteen"],
+  MUSCAT: ["Al Khuwair", "Qurum", "Al Mouj", "Ruwi", "Shatti Al Qurum", "Bawshar"],
+};
+
+// Rough market hints only — shown as a helper on the caregiver rate step.
+export const MARKET_RATE_RANGE: Record<GulfCityCode, { min: number; max: number }> = {
+  DUBAI: { min: 40, max: 70 },
+  ABU_DHABI: { min: 40, max: 65 },
+  RIYADH: { min: 45, max: 75 },
+  JEDDAH: { min: 40, max: 70 },
+  DOHA: { min: 45, max: 75 },
+  KUWAIT_CITY: { min: 4, max: 7 },
+  MANAMA: { min: 4, max: 7 },
+  MUSCAT: { min: 4, max: 7 },
+};
+
+export const OWNER_SERVICE_FEE: Record<CurrencyCode, number> = {
+  AED: 5,
+  SAR: 5,
+  QAR: 5,
+  KWD: 0.5,
+  BHD: 0.5,
+  OMR: 0.5,
+};
+
+// Sun=0 .. Sat=6, matching AvailabilitySlot.dayOfWeek.
+export const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+export const DAY_LABELS_FULL = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+] as const;
+
+// UAE/Qatar/Bahrain/Kuwait/Oman commonly run Sat-Sun off in modern gulf
+// workweeks except KSA/Qatar/Kuwait/Bahrain/Oman which run Fri-Sat. Used to
+// pre-tick "day off" defaults during onboarding.
+export const WEEKEND_DAYS: Record<GulfCityCode, number[]> = {
+  DUBAI: [6, 0], // Sat, Sun
+  ABU_DHABI: [6, 0],
+  RIYADH: [5, 6], // Fri, Sat
+  JEDDAH: [5, 6],
+  DOHA: [5, 6],
+  KUWAIT_CITY: [5, 6],
+  MANAMA: [5, 6],
+  MUSCAT: [5, 6],
+};
